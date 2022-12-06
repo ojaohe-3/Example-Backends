@@ -7,11 +7,11 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 
-// app.listen(PORT, () => {
-//     console.log(`App is listening on port ${PORT}`);
-// });
+app.listen(PORT, () => {
+    console.log(`App is listening on port ${PORT}`);
+});
 
-const fs = require('fs')
+import fs from 'fs';
 
 const credentials = {
     key: fs.readFileSync(process.env.KEY_PATH + 'MyKey.key'),

@@ -2,8 +2,8 @@ import User from "../models/user"
 import MonitorHandler from "./monitorhandler";
 import DBHandler from './DBHandler';
 
-const MAX_USERS = 1_000 // should be selected to 1. minimize database usage, while maintaining good loadfactor for its work memory
-const MAX_LIFETIME_MS = 500_000; // Max lifetime for a user, should be within the expected time of a user.
+const MAX_USERS = 10_000 // max users to Cache
+const MAX_LIFETIME_MS = 500_000; // Max lifetime for a cached user
 type UserMap = {[key: string] : User}
 export default class UserHandler{
     // Signelton Pattern
@@ -54,5 +54,17 @@ export default class UserHandler{
     public addUser(user: User){
         user.timestamp = Date.now()
         this._users[user.uid] = user;
+        this._db.add_user(user);        
+    }
+
+    public get_all(): Partial<User>[]{
+        return Object.values(this._users).map(v => {
+            let temp: Partial<User> = {...v}; // shallow copy
+            // cleans output
+            delete temp.admin;
+            delete temp.timestamp;
+            delete temp.password;
+            return temp;
+        })
     }
 }

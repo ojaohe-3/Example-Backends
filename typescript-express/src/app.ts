@@ -49,6 +49,7 @@ const logger = (req: Request, res : Response, next) => {
 // todo authentication middleware
 app.use(logger);
 
+
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Origin", "*") //TODO
   res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE")
@@ -63,8 +64,11 @@ app.use((err: ResponseError, req: Request, res: Response, next: NextFunction) =>
     res.send("Error Occured!\nPlease try again later");
   })
 
+import api_user from './api/members/users.api'
+import api_monitor from './api/monitors/monitor.api'
 
-  
+app.use("/api/v1/members/users",api_user)
+app.use("/api/v1/monitor",api_monitor)
 // const port = process.env.PORT || 5000;
 // app.set("port", port);
 export default app;
