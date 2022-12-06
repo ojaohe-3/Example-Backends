@@ -2,7 +2,7 @@
 
 | day  | start  | end  | total  | report item | commit |
 |---|---|---|---|---|---|
-| 1  | 14:00  |  18:00 | 4  | 1  | (https://github.com/ojaohe-3/Example-Backends/commit/7864285d81ded85353062a788db52182a649669d )[78642]|
+| 1  | 14:00  |  18:00 | 4  | 1  | [78642](https://github.com/ojaohe-3/Example-Backends/commit/7864285d81ded85353062a788db52182a649669d )|
 |   |   |   |   |   | |
 |   |   |   |   |   | |
 
