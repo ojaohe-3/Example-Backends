@@ -1,21 +1,17 @@
 const FLOAT_ERROR_MARGIN = 0.01;
 
-export function within_range(a: number, b:number){
+export function within_range(a: number, b: number) {
   const diff = Math.abs(a - b);
-  return diff < FLOAT_ERROR_MARGIN;  
+  return diff > FLOAT_ERROR_MARGIN;
 }
 
-export function MovingAverage(
-  values: number[],
-  window_size: number
-): number[] {
-  const ma: number[]= [];
+export function MovingAverage(values: number[], window_size: number): number[] {
+  const ma: number[] = [];
   const remainder = values.length % window_size;
 
-  for (let i = 0; i < values.length; i+window_size) {
-        let slice: number[] | undefined = values.slice(i, i+window_size);
-        if(slice)
-            ma.push(Avg(slice))
+  for (let i = 0; i < values.length; i + window_size) {
+    let slice: number[] | undefined = values.slice(i, i + window_size);
+    if (slice) ma.push(Avg(slice));
   }
   return ma;
 }
@@ -37,8 +33,8 @@ export function Avg(values: number[]): number {
 export function Stg(values: number[]): number {
   const avg = Avg(values);
 
-  let sum_variance = Sum(values.map((v) => Math.pow(v - avg, 2)))
-  let stg = Math.sqrt(sum_variance / (values.length));
+  let sum_variance = Sum(values.map((v) => Math.pow(v - avg, 2)));
+  let stg = Math.sqrt(sum_variance / values.length);
 
   return stg;
 }

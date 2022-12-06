@@ -2,7 +2,7 @@ import { Pool, PoolClient } from "pg";
 import Cursor from "pg-cursor";
 import User from "../models/user";
 import IModel from "./model";
-import UserModel from "./usermodel";
+import UserModel from "./UserModel";
 import MonitorModel from "./MonitorModel";
 
 // export const MAX_ROWS = 200; TODO
@@ -26,6 +26,7 @@ export default class DBContext {
       host: process.env.DB_CONNECT_STRING,
       user: process.env.DB_USER,
       password: process.env.DB_PASS,
+      database: process.env.DB_DATABASE,
       max: 20,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,
@@ -36,6 +37,7 @@ export default class DBContext {
     try {
       return await this._pool.connect();
     } catch (error) {
+      console.log(error);
       return null;
     }
   }
@@ -67,19 +69,19 @@ export default class DBContext {
   ) {
     const client = await this.connect();
     if (client !== null) {
-      let result : any= null;
+      let result: any = null;
       try {
         await client.query("BEGIN");
         model.client = client;
         switch (target_hook) {
           case "getTables":
-            result = await model.getTables(args);
+            result = await model.getTables.bind(model)(args);
             break;
           case "getRow":
-            result = await model.getRow(args);
+            result = await model.getRow.bind(model)(args);
             break;
           case "insertTable":
-            result = await model.insertTable(args);
+            result = await model.insertTable.bind(model)(args);
             break;
 
           default:

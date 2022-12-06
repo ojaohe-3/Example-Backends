@@ -7,7 +7,7 @@ const handler = MonitorHandler.instance;
 
 
 app.get("/", (_, res) => {
-	res.json({"error": "not implemented yet"});
+	res.json(handler.values);
 });
 
  
