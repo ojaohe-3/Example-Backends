@@ -1,7 +1,9 @@
 
 import User from "../models/user";
 import { DatabaseError } from '../utils/errors';
-import DBContext from '../db/dbconnector';
+import DBContext from '../db/DBContext';
+import Monitor from '../models/monitor';
+import MonitorHandler from './MonitorHandler';
 
 export default class DBHandler{
     // Signelton Pattern
@@ -14,25 +16,82 @@ export default class DBHandler{
     }
     
     private _ctx: DBContext;
+    private _monitor: MonitorHandler = MonitorHandler.instance;
     
     public constructor(){
         this._ctx = new DBContext();
     }
 
+    public async add_monitor(monitor: Monitor):  Promise<DatabaseError | null>{
+        try {
+            const mm = await this._ctx.getMonitorModel();
+            if(mm != null){
+                this._monitor.log_database(0, 1);
+                this._ctx.Transaction(mm, "insertTable", monitor);
+                return null;
+            }
+            else{
+                return {}
+            }
 
-
-    private exists_in_table(table, id): boolean{
-        return false;
+        } catch (error) {
+            console.log(error)
+            return {};
+        }
     }
 
 
   
 
-    public add_user(user: User): DatabaseError | null{
-        if(this.exists_in_table("User", user.uid)){
+    public async add_user(user: User): Promise<DatabaseError | null>{
+        try {
+            const um = await this._ctx.getUserModel();
+            if(um != null){
+                this._monitor.log_database(0, 1);
+                this._ctx.Transaction(um, "insertTable", user);
+                return null;
+            }
+            else{
+                return {}
+            }
+
+        } catch (error) {
+            console.log(error)
+            return {};
+
+        }
+    }
+    public async get_monitors(): Promise<Monitor[] | null>{
+        try {
+            const mm = await this._ctx.getMonitorModel();
+            if(mm != null){
+                this._monitor.log_database(0, 1);
+                return await mm.getTables();
+            }
+            else{
+                return null;
+            }
+
+        } catch (error) {
+            console.log(error)
             return null;
         }
+    }
 
-        return {}
+    public async get_user(id: number): Promise<User | null>{
+        try {
+            const um = await this._ctx.getUserModel();
+            if(um != null){
+                this._monitor.log_database(1, 0);
+                return await um.getRow(id);
+            }
+            else{
+                return null;
+            }
+
+        } catch (error) {
+            console.log(error)
+            return null;
+        }
     }
 }

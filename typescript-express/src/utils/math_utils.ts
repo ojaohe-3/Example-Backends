@@ -1,4 +1,11 @@
-export default function MovingAverage(
+const FLOAT_ERROR_MARGIN = 0.01;
+
+export function within_range(a: number, b:number){
+  const diff = Math.abs(a - b);
+  return diff < FLOAT_ERROR_MARGIN;  
+}
+
+export function MovingAverage(
   values: number[],
   window_size: number
 ): number[] {

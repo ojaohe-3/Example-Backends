@@ -1,5 +1,5 @@
 export default interface User{
-    uid: string, // Uniqe
+    id: number, // Uniqe
     first_name: string,
     last_name: string,
     email: string, // Uniqe

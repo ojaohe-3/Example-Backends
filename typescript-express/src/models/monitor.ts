@@ -1,4 +1,6 @@
 export default interface Monitor{
+    id: number,
+    timestamp: Date,
     requests_total: number,
     error_requests: number,
     successfull_requests: number,
@@ -11,15 +13,6 @@ export default interface Monitor{
     database_reads: number,
     database_write_rate: number, // runnign average per hour 
     database_read_rate: number, // runnign average per hour 
-    pages: MonitorPage[],
+    response_times?: number[]
 
 }
-
-export interface MonitorPage{
-    log: string,
-    error: boolean,
-    timestamp: Date,
-    delay: number,
-    user_id?: string,
-    
-} 

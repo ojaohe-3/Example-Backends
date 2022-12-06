@@ -1,13 +1,12 @@
 
 import { Router } from "express";
 import UserHandler from '../../handlers/UserHandler';
+import User from "../../models/user";
 
 const app = Router();
 const handler = UserHandler.instance;
 
-interface userFormat{
-
-}
+type userFormat = Partial<User>
 
 app.get("/", (_, res) => {
 	res.json(handler.get_all());
@@ -16,6 +15,7 @@ app.get("/", (_, res) => {
 app.get("/:id", (req, res) => {
 	try {
 		const id = req.params.id;
+		handler.get_user(+id);
 
 	} catch (error) {
 

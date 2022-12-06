@@ -51,9 +51,9 @@ export default class UserHandler{
         }
     }
 
-    public addUser(user: User){
+    public add_user(user: User){
         user.timestamp = Date.now()
-        this._users[user.uid] = user;
+        this._users[user.id] = user;
         this._db.add_user(user);        
     }
 
@@ -66,5 +66,13 @@ export default class UserHandler{
             delete temp.password;
             return temp;
         })
+    }
+    public async get_user(id: number): Promise<User | null>{
+        if(this._users[id]){
+            return this._users[id];
+        }else{
+            return await this._db.get_user(id);
+        }
+
     }
 }
