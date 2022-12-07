@@ -1,6 +1,8 @@
 import User from "../models/user";
 import MonitorHandler from "./monitorhandler";
 import DBHandler from "./DBHandler";
+import { DatabaseError } from "pg";
+import { DBResult } from "../db/model";
 
 const MAX_USERS = 10_000; // max users to Cache
 const MAX_LIFETIME_MS = 500_000; // Max lifetime for a cached user
@@ -18,14 +20,11 @@ export default class UserHandler {
 
   private _users: UserMap = {};
 
-
-  
-
   /// Flushes out cached users that existed for longer then MAX_LIFETIME
   private flush() {
     Object.entries(this._users).filter(([key, user]) => {
       if (user.timestamp && user.timestamp < Date.now() - MAX_LIFETIME_MS) {
-        delete this._users[key]
+        delete this._users[key];
       }
     });
   }
@@ -46,22 +45,28 @@ export default class UserHandler {
     }
   }
 
-  public async add_user(user: Partial<User>) {
+  public async add_user(
+    user: Partial<User>
+  ): Promise<DatabaseError | null | undefined> {
     user.timestamp = Date.now();
-    const id: number|null = await DBHandler.instance.add_user(user);
-    if (id !== null){
+    const [id, error] = await DBHandler.instance.add_user(user);
+
+    if (id) {
       user.id = id;
       // map unconstrained to constrained
-      const tmp = {...user} as User;
-      this._users[id] = tmp;
-      if(Object.keys(this._users).length > MAX_USERS){
-          this.flush_overflow();
+      const tmp = { ...user } as User;
+      this._users[user.id] = tmp;
+      if (Object.keys(this._users).length > MAX_USERS) {
+        this.flush_overflow();
       }
+      return null;
     }
+    return error;
   }
 
-  public get_all(): Partial<User>[] {
-    // const temp = await DBHandler.instance.get_users(); // TODO
+  public async get_all(): Promise<Partial<User>[]> {
+    const [temp, error] = await DBHandler.instance.get_users();
+    temp?.forEach((u) => (this._users[u.id] = u));
     return Object.values(this._users).map((v) => {
       let temp: Partial<User> = { ...v }; // shallow copy
       // cleans output
@@ -71,15 +76,14 @@ export default class UserHandler {
       return temp;
     });
   }
-  public async get_user(id: number): Promise<User | null> {
+  public async get_user(id: number): Promise<DBResult<User>> {
     if (this._users[id]) {
-      return this._users[id];
+      return [this._users[id], null];
     } else {
-      const user =  await DBHandler.instance.get_user(id);
-      if(user !== null)
+      const [user, error] = await DBHandler.instance.get_user(id);
+      if(user)
         this._users[user.id] = user
-      
-        return user;
+      return [user, error];
     }
   }
 }

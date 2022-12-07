@@ -3,25 +3,18 @@ import Cursor from "pg-cursor";
 import User from "../models/user";
 import IModel from "./model";
 import UserModel from "./UserModel";
-import MonitorModel from "./MonitorModel";
 
 // export const MAX_ROWS = 200; TODO
 
-interface IModels {
-  User: UserModel;
-  Monitor: MonitorModel;
-}
+
 
 export default class DBContext {
   private _pool: Pool;
   private _cursor: Cursor | null = null;
-  private _models: IModels;
+  private _user: UserModel;
 
   public constructor() {
-    this._models = {
-      User: new UserModel(),
-      Monitor: new MonitorModel(),
-    };
+    this._user = new UserModel();
     this._pool = new Pool({
       host: process.env.DB_CONNECT_STRING,
       user: process.env.DB_USER,
@@ -42,29 +35,21 @@ export default class DBContext {
     }
   }
 
-  public async getUserModel(): Promise<UserModel | null> {
-    const client = await this.connect();
-    if (client !== null) {
-      this._models.User.client = client;
-      return this._models.User;
-    } else {
-      return null;
+  public async user(){
+    const c = await this.connect();
+    if (c !== null){
+      
+      this._user.client = c;
+      return this._user;
     }
+    return null;
+
   }
 
-  public async getMonitorModel(): Promise<MonitorModel | null> {
-    const client = await this.connect();
-    if (client !== null) {
-      this._models.Monitor.client = client;
-      return this._models.Monitor;
-    } else {
-      return null;
-    }
-  }
 
-  public async Transaction(
-    model: IModel,
-    target_hook: keyof IModel,
+  public async Transaction<T>(
+    model: IModel<T>,
+    target_hook: keyof IModel<T>,
     ...args: any[]
   ) {
     const client = await this.connect();
@@ -74,14 +59,14 @@ export default class DBContext {
         await client.query("BEGIN");
         model.client = client;
         switch (target_hook) {
-          case "getTables":
-            result = await model.getTables.bind(model)(args);
+          case "getRows":
+            result = await model.getRows.bind(model)(args);
             break;
           case "getRow":
             result = await model.getRow.bind(model)(args);
             break;
           case "insertTable":
-            result = await model.insertTable.bind(model)(args);
+            result = await model.insertTable.bind(model)(args[0]);
             break;
 
           default:

@@ -7,7 +7,8 @@ const handler = MonitorHandler.instance;
 
 
 app.get("/", (_, res) => {
-	res.json(handler.values);
+	MonitorHandler.instance.monitor.successfull_requests += 1
+	res.json(handler.monitor);
 });
 
  

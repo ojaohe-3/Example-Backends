@@ -1,9 +1,11 @@
 import Cursor from "pg-cursor";
-import { PoolClient } from "pg";
-export default interface IModel {
-  table: string;
+import { DatabaseError, PoolClient } from "pg";
+
+export type DBResult<T> = [T | null | undefined, DatabaseError | null | undefined]
+export type DBResults<T> = [T[] | null | undefined, DatabaseError | null | undefined]
+export default interface IModel<T> {
   client?: PoolClient;
-  insertTable: (item: any) => Promise<any>;
-  getTables: (...querry_items: any[]) => Promise<any[]>;
-  getRow: (...querry_items: any[]) => Promise<any>;
+  insertTable: <K>(item: any) => Promise<DBResult<K>>;
+  getRows: (...querry_items: any[]) => Promise<DBResults<T>>;
+  getRow: (...querry_items: any[]) => Promise<DBResult<T>>;
 }

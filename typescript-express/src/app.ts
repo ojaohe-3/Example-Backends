@@ -1,6 +1,6 @@
 import cors from "cors";
 import express, { Application, NextFunction, Request, Response } from "express";
-
+import MonitorHandler from './handlers/MonitorHandler';
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -39,18 +39,17 @@ const logger = (req: Request, res: Response, next) => {
       req.originalUrl
     }: ${req.method} request`
     );
-    MonitorHandler.instance.log_requests(1);
+    MonitorHandler.instance.monitor.requests += 1;
     next();
   };
   app.use(logger);
   // response timer Metric
   app.use((req, res, next) => {
-    console.log(`${req.method} ${req.originalUrl} [STARTED]`)
     const start = process.hrtime();
     res.on('finish', () => {            
       const elapsed = process.hrtime(start);
       const elapsed_ms = elapsed[0] * 1000 + elapsed[1] / 1e6;
-      MonitorHandler.instance.log_response_time(elapsed_ms)
+      MonitorHandler.instance.monitor.response_times.push(elapsed_ms)
     })
   
   
@@ -78,7 +77,6 @@ app.use(
 
 import api_user from "./api/members/users.api";
 import api_monitor from "./api/monitors/monitor.api";
-import MonitorHandler from './handlers/MonitorHandler';
 
 app.use("/api/v1/members/users", api_user);
 app.use("/api/v1/monitor", api_monitor);
