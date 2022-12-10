@@ -5,17 +5,6 @@ export function within_range(a: number, b: number) {
   return diff < FLOAT_ERROR_MARGIN;
 }
 
-export function MovingAverage(values: number[], window_size: number): number[] {
-  const ma: number[] = [];
-  const remainder = values.length % window_size;
-
-  for (let i = 0; i < values.length; i + window_size) {
-    let slice: number[] | undefined = values.slice(i, i + window_size);
-    if (slice) ma.push(Avg(slice));
-  }
-  return ma;
-}
-
 // Sum of array, probably already exists somewheref in a standard library.
 export function Sum(values: number[]): number {
   let sum = 0;

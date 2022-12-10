@@ -22,8 +22,8 @@ export default class UserHandler {
 
 	/// Flushes out cached users that existed for longer then MAX_LIFETIME
 	private flush() {
-		Object.entries(this._users).filter(([key, user]) => {
-			if (user.timestamp && user.timestamp < Date.now() - MAX_LIFETIME_MS) {
+		Object.entries(this._users).forEach(([key, user]) => {
+			if (user.timestamp && (user.timestamp + MAX_LIFETIME_MS) < Date.now()) {
 				delete this._users[key];
 			}
 		});
@@ -48,14 +48,28 @@ export default class UserHandler {
 	}
 
 	public async add_user(
-		user: Partial<User>
+		user: Partial<User>, add_db = true
 	): Promise<DatabaseError | null | undefined> {
 		user.timestamp = Date.now();
+//#region  Testing
+		if (add_db === false) {
+			const id = Math.random() * 100000;
+			user.id = id;
+			this._users[id] = { ...user } as User;
+
+			if (this.length > MAX_USERS) {
+				this.flush_overflow();
+			}
+			// for testing making sure no db entries are inserted
+			return null;
+		}
+//#endregion
 		// Query to insert to database
 		const query = await DBContext.instance.user();
 		if (query === null) {
 			return new DatabaseError("failed to get connector", 23, "error");
 		}
+
 		const [id, error] = await query!.insertRow<number>(user);
 		if (id) {
 			user.id = id;
@@ -114,8 +128,11 @@ export default class UserHandler {
 		}
 	}
 
-	public async delete_user(id: number): Promise<DBResult<any>> {
+	public async delete_user(id: number, db: boolean = true): Promise<DBResult<any>> {
 		delete this._users[id];
+		if (db === false) {
+			return [{}, null];
+		}
 
 		const query = await DBContext.instance.user();
 		if (query === null) {

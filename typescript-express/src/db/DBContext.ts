@@ -74,7 +74,7 @@ export default class DBContext {
             result = await model.getRows.bind(model)(args);
             break;
           case "getRow":
-            result = await model.getRow.bind(model)(args);
+            result = await model.getRow.bind(model)(args[0]);
             break;
           case "insertRow":
             result = await model.insertRow.bind(model)(args[0]);
@@ -89,9 +89,9 @@ export default class DBContext {
         return result;
       } catch (error) {
         await client.query("ROLLBACK");
-      } finally {
         client.release();
-      }
+
+      } 
     }
   }
 }

@@ -40,29 +40,20 @@ describe("DBcontext test", () => {
         };
 
 
-        beforeEach(async () => {
-            querry = await handler.user();
-            const [id, error] = await querry!.insertRow<number>(insert)
 
-            expect(error).toBeNull();
+
+        test("Transaction work for insertRow", async () => {
+
+            querry = await handler.user();
+            const [id, err1] = await querry!.insertRow<number>(insert);
+            expect(err1).toBeNull();
             expect(id).not.toBeNull();
-            insert.id = id!;
-            const delay = (ms: number) => new Promise( resolve => setTimeout(resolve, ms) )
-            await delay(500) // wait 500 ms
+            insert.id = id! as number; 
 
-        })
-        afterEach(async () => {
-            querry = await handler.user();
-            const [res, error] = await querry!.deleteRow(insert.id!);
-            expect(error).toBeNull();
-            expect(res).not.toBeNull();
-            // get a new connector from the pool
-            querry = await handler.user();
-
-        })
-
+        });
 
         test("Transaction work for getrows", async () => {
+
             const [items, error] = await handler.Transaction(querry!, "getRows");
             expect(error).toBeNull();
             expect(items).not.toBeNull();
@@ -71,6 +62,7 @@ describe("DBcontext test", () => {
                 expect.arrayContaining([
                     expect.objectContaining({ email: insert.email })
                 ]));
+
 
 
         });
@@ -82,39 +74,18 @@ describe("DBcontext test", () => {
             expect(item).toEqual(expect.objectContaining({ email: insert.email }));
         });
 
-        test("Transaction work for insertRow", async () => {
-            const user: Partial<User> = {
-                first_name: "test2",
-                last_name: "user2",
-                email: "test.user.2@test.com",
-                password: "test"
-            };
-            const [id, error] = await handler.Transaction(querry!, "insertRow", user);
-            expect(error).toBeNull();
-            expect(id).not.toBeNull();
-
-            querry = await handler.user();
-            let [u, error2] = await querry!.getRow(id);
-            expect(error2).toBeNull();
-            expect(u).not.toBeNull();
-            expect(u).toEqual(expect.objectContaining({ email: user.email }))
-
-        });
 
         test("Transaction work for deleteRow", async () => {
-            const [res, error] = await handler.Transaction(querry!, "deleteRow");
-            expect(error).toBeNull();
-            expect(res).not.toBeNull();
 
             querry = await handler.user();
-            let [u, error2] = await querry!.getRow(insert.id!);
-            expect(error2).not.toBeNull();
-            expect(u).toBeNull();
+            const [res, err2] = await querry!.deleteRow(insert.id!);
+            expect(err2).toBeNull();
+            expect(res).not.toBeNull();
 
         });
 
         test("Trasnaction throws 'invalid key' for any other case", async () =>{
-            expect(await handler.Transaction(querry!, "client")).toThrowError();
+            expect(await handler.Transaction(querry!, "client")).toBeUndefined();
         });
     });
 })

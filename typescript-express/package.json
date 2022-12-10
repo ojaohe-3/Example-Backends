@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "nodemon ./src/index.ts",
     "lint": "eslint --ext .ts --fix .",
-    "test": "jest",
+    "test": "jest --coverage",
     "start": "npx tsc"
   },
   "keywords": [],

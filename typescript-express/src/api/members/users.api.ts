@@ -1,7 +1,7 @@
 
 import { Router } from "express";
 import UserHandler from '../../handlers/UserHandler';
-import User from "../../models/user";
+import User, { Email } from "../../models/user";
 import MonitorHandler from '../../handlers/MonitorHandler';
 import crypto from 'crypto';
 const app = Router();
@@ -25,9 +25,14 @@ app.get("/:id", async (req, res) => {
 			delete temp.admin
 			delete temp.password;
 			delete temp.timestamp;
-			MonitorHandler.instance.monitor.successfull_requests += 1
-			res.json(temp);
+			MonitorHandler.instance.monitor.successfull_requests += 1;
+			res.json({
+				success: true,
+				body: temp
+			});
 		} else {
+			MonitorHandler.instance.monitor.error_requests += 1;
+
 			res.status(500).json({
 				success: false,
 				details: error?.detail,
@@ -37,7 +42,12 @@ app.get("/:id", async (req, res) => {
 		}
 
 	} catch (error) {
-		res.json({ error: error })
+		MonitorHandler.instance.monitor.error_requests += 1;
+
+		res.status(500).json({
+			success: false,
+			error: error
+		})
 	}
 });
 
@@ -46,13 +56,20 @@ app.post("/", async (req, res) => {
 
 		const data = req.body as userFormat;
 		data.password = crypto.createHash('sha256').update(data.password!).digest('hex')
+
+		
 		const error = await handler.add_user(data);
+
 		if (error === null) {
+			MonitorHandler.instance.monitor.successfull_requests += 1;
+
 			res.json({
 				success: true,
 				message: `user ${data.first_name} ${data.last_name} added successfully`
 			})
 		} else {
+			MonitorHandler.instance.monitor.error_requests += 1;
+
 			res.status(500).json({
 				success: false,
 				details: error?.detail,
@@ -61,6 +78,8 @@ app.post("/", async (req, res) => {
 			})
 		}
 	} catch (error) {
+		MonitorHandler.instance.monitor.error_requests += 1;
+		console.log(error)
 		res.status(500).json({
 			success: false,
 			error: error
@@ -71,8 +90,10 @@ app.post("/", async (req, res) => {
 app.delete("/:id", async (req, res) => {
 	try {
 		const id = req.params.id;
-		const [res, error] = await handler.delete_user(+id);
+		const [_res, error] = await handler.delete_user(+id);
 		if (error) {
+			MonitorHandler.instance.monitor.error_requests += 1;
+
 			res.status(500).json({
 				success: false,
 				details: error?.detail,
@@ -80,6 +101,8 @@ app.delete("/:id", async (req, res) => {
 				name: error?.name,
 			})
 		} else {
+			MonitorHandler.instance.monitor.successfull_requests += 1;
+
 			res.json({
 				success: true,
 				message: "user deleted successfully"
@@ -87,6 +110,9 @@ app.delete("/:id", async (req, res) => {
 		}
 
 	} catch (error) {
+		MonitorHandler.instance.monitor.error_requests += 1;
+
+		console.log(error)
 		res.status(500).json({
 			success: false,
 			error: error

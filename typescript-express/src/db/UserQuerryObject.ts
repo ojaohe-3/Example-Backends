@@ -27,7 +27,7 @@ export default class UserQuerryObject implements QuerryObject<UserSchema> {
 						item.password,
 					]);
 					this._client?.release();
-					return [rows[0], null];
+					return [rows[0]['id'], null];
 				} catch (error: any) {
 					//   console.log(error);
 					
