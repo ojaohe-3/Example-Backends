@@ -1,4 +1,5 @@
-import { within_range, Avg, Sum, Std, } from "../src/utils/math_utils";
+
+import { within_range,  Avg, Sum, Std  } from "../src/utils/math_utils";
 
 describe("Math utilites", () => {
     describe("within range works as inteded", () => {

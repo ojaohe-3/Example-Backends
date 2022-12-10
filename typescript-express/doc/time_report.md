@@ -14,3 +14,4 @@
 1. Added the basic framework for ts, planned database handler, user handler and monitor handler. planning to use JWT for authentication.
 1. Added DB and most of its functionality, made a dbcontext, the main thought to seperate context and handler is for testing. Models changed a bit, added the sql tables. made monitor logic.
 1. fixed issues with connecting to database. and error can propagate to api
+1. large refactor of dbhandler and tests on the database
