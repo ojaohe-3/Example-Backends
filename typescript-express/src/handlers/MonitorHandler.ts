@@ -1,6 +1,5 @@
 import Monitor from "../models/monitor";
-import { Avg, within_range, MovingAverage, Stg } from "../utils/math_utils";
-import DBHandler from "./DBHandler";
+import { Avg, Std } from "../utils/math_utils";
 
 const LOG_METRIC_EVER_MS = 5_000;
 const LOG_METRIC_EVER_S = 5;
@@ -43,7 +42,7 @@ export default class MonitorHandler {
     private log_metrics() {
         // Internal Response time
         const avg = Avg(this._monitor.response_times || []) || 0;
-        const std = Stg(this._monitor.response_times || []) || 0;
+        const std = Std(this._monitor.response_times || []) || 0;
         this._monitor.avg_response_time = avg;
         this._monitor.std_response_time = std;
         this._monitor.response_times = [];

@@ -1,20 +1,31 @@
 import { Pool, PoolClient } from "pg";
 import Cursor from "pg-cursor";
 import User from "../models/user";
-import IModel from "./model";
-import UserModel from "./UserModel";
+import QuerryObject from "./QuerryObject";
+import UserQuerryObject from "./UserQuerryObject";
+import dotenv from 'dotenv'
+dotenv.config();
 
 // export const MAX_ROWS = 200; TODO
 
 
 
 export default class DBContext {
+  private static _instance: DBContext | null = null;
+  public static get instance() {
+    if (this._instance === null) {
+      this._instance = new DBContext();
+    }
+    return this._instance;
+  }
+
+
   private _pool: Pool;
   private _cursor: Cursor | null = null;
-  private _user: UserModel;
+  private _user: UserQuerryObject;
 
   public constructor() {
-    this._user = new UserModel();
+    this._user = new UserQuerryObject();
     this._pool = new Pool({
       host: process.env.DB_CONNECT_STRING,
       user: process.env.DB_USER,
@@ -35,7 +46,7 @@ export default class DBContext {
     }
   }
 
-  public async user(){
+  public async user(): Promise<UserQuerryObject | null>{
     const c = await this.connect();
     if (c !== null){
       
@@ -48,8 +59,8 @@ export default class DBContext {
 
 
   public async Transaction<T>(
-    model: IModel<T>,
-    target_hook: keyof IModel<T>,
+    model: QuerryObject<T>,
+    target_hook: keyof QuerryObject<T>,
     ...args: any[]
   ) {
     const client = await this.connect();
@@ -65,10 +76,12 @@ export default class DBContext {
           case "getRow":
             result = await model.getRow.bind(model)(args);
             break;
-          case "insertTable":
-            result = await model.insertTable.bind(model)(args[0]);
+          case "insertRow":
+            result = await model.insertRow.bind(model)(args[0]);
             break;
-
+          case "deleteRow":
+            result = await model.deleteRow.bind(model)(args[0]);
+            break
           default:
             throw "invalid key";
         }
