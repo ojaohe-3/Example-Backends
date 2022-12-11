@@ -2,12 +2,12 @@ import QuerryObject, { DBResults } from "./QuerryObject";
 import User from "../models/user";
 import { DatabaseError, PoolClient } from "pg";
 import { DBResult } from './QuerryObject';
+import MonitorHandler from "../handlers/MonitorHandler";
 
 export type UserSchema = User;
 
 export default class UserQuerryObject implements QuerryObject<UserSchema> {
 	private _client: PoolClient | null = null;
-	
 	public set client(value: PoolClient) {
 		this._client = value;
 	}
@@ -42,6 +42,7 @@ export default class UserQuerryObject implements QuerryObject<UserSchema> {
 		public async getRows(): Promise<DBResults<UserSchema>> {
 			if (this._client !== null) {
 				try {
+
 					const text = "SELECT * From Users";
 					// cursor.read
 					const { rows } = await this._client.query(text);
@@ -58,6 +59,7 @@ export default class UserQuerryObject implements QuerryObject<UserSchema> {
 	public async getRow(uid: number): Promise<DBResult<UserSchema>> {
 		if (this._client !== null) {
 			try {
+
 				const text = "SELECT * From Users where id = $1";
 				const { rows } = await this._client.query(text, [uid]);
 				this._client?.release();

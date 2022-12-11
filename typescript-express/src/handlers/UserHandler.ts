@@ -3,6 +3,7 @@ import User from "../models/user";
 import { DatabaseError } from "pg";
 import { DBResult } from "../db/QuerryObject";
 import DBContext from "../db/DBContext";
+import MonitorHandler from "./MonitorHandler";
 
 const MAX_USERS = 10_000; // max users to Cache
 const MAX_LIFETIME_MS = 500_000; // Max lifetime for a cached user
@@ -70,6 +71,7 @@ export default class UserHandler {
 			return new DatabaseError("failed to get connector", 23, "error");
 		}
 
+		MonitorHandler.instance.monitor.database_writes += 1;
 		const [id, error] = await query!.insertRow<number>(user);
 		if (id) {
 			user.id = id;
@@ -90,6 +92,8 @@ export default class UserHandler {
 			console.log("no connector");
 			return [];
 		}
+		MonitorHandler.instance.monitor.database_reads += 1;
+
 		const [users, error] = await query.getRows();
 		if (error) {
 			console.log(error);
@@ -119,6 +123,7 @@ export default class UserHandler {
 			if (query === null) {
 				return [null, new DatabaseError("failed to get connector", 23, "error")];
 			}
+			MonitorHandler.instance.monitor.database_reads += 1;
 			const [user, error] = await query.getRow(id);
 			if (user) {
 				user.timestamp = Date.now();
@@ -133,6 +138,7 @@ export default class UserHandler {
 		if (db === false) {
 			return [{}, null];
 		}
+		MonitorHandler.instance.monitor.database_writes += 1;
 
 		const query = await DBContext.instance.user();
 		if (query === null) {

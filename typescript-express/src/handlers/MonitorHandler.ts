@@ -1,8 +1,8 @@
 import Monitor from "../models/monitor";
 import { Avg, Std } from "../utils/math_utils";
 
-const LOG_METRIC_EVER_MS = 5_000;
-const LOG_METRIC_EVER_S = 5;
+const LOG_METRIC_EVER_S = 60;
+const LOG_METRIC_EVER_MS = LOG_METRIC_EVER_S * 1000;
 export default class MonitorHandler {
     // Signelton Pattern
     private static _instance: MonitorHandler | null = null;

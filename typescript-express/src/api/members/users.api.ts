@@ -20,7 +20,6 @@ app.get("/:id", async (req, res) => {
 		const id = req.params.id;
 		const [user, error] = await handler.get_user(+id);
 		if (user) {
-			console.log(user)
 			const temp: Partial<User> = { ...user };
 			delete temp.admin
 			delete temp.password;
@@ -80,7 +79,7 @@ app.post("/", async (req, res) => {
 	} catch (error) {
 		MonitorHandler.instance.monitor.error_requests += 1;
 		console.log(error)
-		res.status(500).json({
+		res.status(400).json({
 			success: false,
 			error: error
 		})
