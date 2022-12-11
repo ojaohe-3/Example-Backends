@@ -2,7 +2,7 @@
 
 Users member items.
 
-**URL** : `/api/v1/members/users/`
+**URL** : `/api/v1/users/`
 
 **Method** : `POST`
 
@@ -75,7 +75,7 @@ Users member items.
 }
 ```
 
-**URL** : `/api/v1/members/users/:id`
+**URL** : `/api/v1/users/:id`
 
 **Method** : `GET`
 
@@ -118,7 +118,7 @@ Users member items.
 }
 ```
 
-**URL** : `/api/v1/members/users/:id`
+**URL** : `/api/v1/users/:id`
 
 **Method** : `GET`
 
@@ -161,7 +161,7 @@ Users member items.
 }
 ```
 
-**URL** : `/api/v1/members/users/:id`
+**URL** : `/api/v1/users/:id`
 
 **Method** : `DELETE`
 
@@ -194,7 +194,7 @@ Users member items.
 }
 ```
 
-*URL** : `/api/v1/members/users/`
+*URL** : `/api/v1/users/`
 
 **Method** : `GET`
 

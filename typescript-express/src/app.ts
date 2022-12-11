@@ -78,7 +78,7 @@ app.use(
 import api_user from "./api/members/users.api";
 import api_monitor from "./api/monitors/monitor.api";
 
-app.use("/api/v1/members/users", api_user);
+app.use("/api/v1/users", api_user);
 app.use("/api/v1/monitor", api_monitor);
 // const port = process.env.PORT || 5000;
 // app.set("port", port);

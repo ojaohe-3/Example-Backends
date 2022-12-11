@@ -23,9 +23,9 @@ export default class UserHandler {
 
 	/// Flushes out cached users that existed for longer then MAX_LIFETIME
 	private flush() {
-		Object.entries(this._users).forEach(([key, user]) => {
+		Object.values(this._users).map((user) => {
 			if (user.timestamp && (user.timestamp + MAX_LIFETIME_MS) < Date.now()) {
-				delete this._users[key];
+				delete this._users[user.id];
 			}
 		});
 	}
@@ -52,19 +52,14 @@ export default class UserHandler {
 		user: Partial<User>, add_db = true
 	): Promise<DatabaseError | null | undefined> {
 		user.timestamp = Date.now();
-//#region  Testing
+		//#region  Testing
 		if (add_db === false) {
-			const id = Math.random() * 100000;
-			user.id = id;
-			this._users[id] = { ...user } as User;
-
-			if (this.length > MAX_USERS) {
-				this.flush_overflow();
-			}
+			this._users[user.id!] = { ...user } as User;
+			this.flush_overflow();
 			// for testing making sure no db entries are inserted
 			return null;
 		}
-//#endregion
+		//#endregion
 		// Query to insert to database
 		const query = await DBContext.instance.user();
 		if (query === null) {
@@ -78,9 +73,8 @@ export default class UserHandler {
 			// map unconstrained to constrained
 			const tmp = { ...user } as User;
 			this._users[user.id!] = tmp;
-			if (this.length > MAX_USERS) {
-				this.flush_overflow();
-			}
+			this.flush_overflow();
+
 			return null;
 		}
 		return error;
@@ -100,10 +94,8 @@ export default class UserHandler {
 			return [];
 		}
 		users?.forEach((u) => (this._users[u.id] = u));
-		if (this.length > MAX_USERS) {
-			this.flush_overflow();
-		}
 
+		this.flush_overflow();
 
 		return Object.values(this._users).map((v) => {
 			let temp: Partial<User> = { ...v }; // shallow copy

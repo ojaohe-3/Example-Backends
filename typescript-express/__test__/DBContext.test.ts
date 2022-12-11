@@ -45,7 +45,7 @@ describe("DBcontext test", () => {
         test("Transaction work for insertRow", async () => {
 
             querry = await handler.user();
-            const [id, err1] = await querry!.insertRow<number>(insert);
+            const [id, err1] = await handler!.Transaction(querry!, "insertRow", insert);
             expect(err1).toBeNull();
             expect(id).not.toBeNull();
             insert.id = id! as number; 
@@ -78,7 +78,7 @@ describe("DBcontext test", () => {
         test("Transaction work for deleteRow", async () => {
 
             querry = await handler.user();
-            const [res, err2] = await querry!.deleteRow(insert.id!);
+            const [res, err2] = await handler.Transaction(querry!, "deleteRow", insert.id!);
             expect(err2).toBeNull();
             expect(res).not.toBeNull();
 

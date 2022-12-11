@@ -62,7 +62,7 @@ export default class DBContext {
     model: QuerryObject<T>,
     target_hook: keyof QuerryObject<T>,
     ...args: any[]
-  ) {
+  ): Promise<any> {
     const client = await this.connect();
     if (client !== null) {
       let result: any = null;
