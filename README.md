@@ -14,7 +14,7 @@ planned backends:
 
 Currently only typescript is implemented
 # Database(DB)
-    The current only supported database is postgresql. All servers should include configuration files to change connection string if postgres is unwanted locally.
+The current only supported database is postgresql. All servers should include configuration files to change connection string if postgres is unwanted locally.
 ## Setup db
 you need the following:
 
