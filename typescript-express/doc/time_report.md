@@ -7,6 +7,7 @@
 | 2  | 19:00 | 21:00  | 2 | 3  | 873d9aaf98a2c11c0ff43a00a701da15dcfb93ca |
 | 5  | 16:00 | 20:00 | 4 | 4 | e20eaafb496a5e7cfa2a27f5bbf88f29e37c21ff|
 | 5  | 20:00 | 24:00 | 4 | 5 | 849efa02352edfcffb9c6584acf79b88f5cc343b|
+| 7  | 12:00 | 17:00 | 5 | 6 | e42dda84a9f38c670ddaa41b127b9a5ab82fe3c8|
 
 
 
@@ -17,3 +18,4 @@
 1. fixed issues with connecting to database. and error can propagate to api
 1. large refactor of dbhandler and tests on the database
 1. Finished tests ts-backend is complete-ish
+1. Made a benchmark tester, that do some mass testing, figure out a few bugs. Some are yet to be fixed. Reformated userquerry object because the client pool had issue giving out legitimate clients. Finished off documentation and made some edits in make file.
