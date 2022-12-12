@@ -1,9 +1,9 @@
-[]()
+![](https://github.com/ojaohe-3/Example-Backends/blob/main/typescript-express/doc/app-structure.png "General structure")
 
 
 # DBContext
-    Singelton pattern that maintains all querry objects life time.
-    Will at the moment create only a ``` UserQuerryObject ``` and exposes it to others
+Singelton pattern that maintains all querry objects life time.
+Will at the moment create only a `UserQuerryObject` and exposes it to others
 
 ## Functions
 #### instance
