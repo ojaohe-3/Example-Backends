@@ -61,13 +61,12 @@ export default class UserHandler {
 		}
 		//#endregion
 		// Query to insert to database
-		const query = await DBContext.instance.user();
+		const query = DBContext.instance.user;
 		if (query === null) {
 			return new DatabaseError("failed to get connector", 23, "error");
 		}
-
 		MonitorHandler.instance.monitor.database_writes += 1;
-		const [id, error] = await query!.insertRow<number>(user);
+		const [id, error] = await query.insertRow<number>(user);
 		if (id) {
 			user.id = id;
 			// map unconstrained to constrained
@@ -81,7 +80,7 @@ export default class UserHandler {
 	}
 
 	public async get_all(): Promise<Partial<User>[]> {
-		const query = await DBContext.instance.user();
+		const query = DBContext.instance.user;
 		if (query === null) {
 			console.log("no connector");
 			return [];
@@ -94,24 +93,25 @@ export default class UserHandler {
 			return [];
 		}
 		users?.forEach((u) => (this._users[u.id] = u));
-
-		this.flush_overflow();
-
-		return Object.values(this._users).map((v) => {
+		const res = Object.values(this._users).map((v) => {
 			let temp: Partial<User> = { ...v }; // shallow copy
 			// cleans output
 			delete temp.admin;
 			delete temp.timestamp;
 			delete temp.password;
 			return temp;
-		});
+		})
+
+		this.flush_overflow();
+
+		return res;
 	}
 
 	public async get_user(id: number): Promise<DBResult<User>> {
 		if (this._users[id]) {
 			return [this._users[id], null];
 		} else {
-			const query = await DBContext.instance.user();
+			const query = DBContext.instance.user;
 			if (query === null) {
 				return [null, new DatabaseError("failed to get connector", 23, "error")];
 			}
@@ -132,7 +132,7 @@ export default class UserHandler {
 		}
 		MonitorHandler.instance.monitor.database_writes += 1;
 
-		const query = await DBContext.instance.user();
+		const query = DBContext.instance.user;
 		if (query === null) {
 			return [null, new DatabaseError("failed to get connector", 23, "error")];
 		}

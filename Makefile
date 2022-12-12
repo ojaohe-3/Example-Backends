@@ -1,35 +1,38 @@
 
-install: generate-ssh-key generate-enviorments run-postsql-docker install-flask-requirements install-client-requirements install-aiohttp-requirements
+
+POSTGRES_DATABASE ?= $(shell bash -c 'read -p "Database: " database; echo $$database')
+POSTGRES_USER ?= $(shell bash -c 'read -p "User: " usr; echo $$usr')
+POSTGRES_HOST ?= $(shell bash -c 'read -p "Host: " host; echo $$host')
+
+
+install-db: generate-ssh-key run-postsql-docker create-tables
 
 
 generate-client-tester: 
 	python -m venv ./client-tester
-generate-aiohttp-backend: 
-	python -m venv ./aiohttp-backend
-generate-flask-backend: 
-	python -m venv ./flask-backend
 
-install-flask-requirements:
-	pip install -r ./flask-backend
 
 install-client-requirements:
-	pip install -r ./client-tested
+	pip install -r ./client-tester
 
-install-aiohttp-requirements:
-	pip install -r ./aiohttp-backend
+activate-venv-client: generate-client-tester
+	source ./client-tester/bin/activate
 
-generate-enviorments: generate-client-tester generate-aiohttp-backend generate-flask-backend ts-example
+run-benchmark: install-client-requirements activate-venv-client
+	python ./client-tester/benchmarker.py
+
+
 
 create-envs-files:
 ifeq ("$(wildcard *.env)","")
 	cp docker.env.example docker.env 
 endif
 
-run-postsql-docker: create-envs-files
+run-postgresql-docker: create-envs-files
 	docker-compose up -d
 
-ts-example: 
-	npm install --prefix ./typescript-express
+create-tables: run-postgresql-docker
+	psql -h ${POSTGRES_HOST} -U ${POSTGRES_USER} -d ${POSTGRES_DATABASE} -a -f create_tables.sql
 
 
 generate-ssh-key:
@@ -41,5 +44,16 @@ endif
 # run-client:
 # run-flask-server:
 # run-aiohttp-server:
-run-ts-server:
+
+
+ts-install: 
+	npm install --prefix ./typescript-express
+
+ts-build: ts-install
+	npm run build --prefix ./typescript-express
+
+run-ts-server: ts-build
 	npm start --prefix ./typescript-express
+
+ts-run-test: ts-build
+	npm run test --prefix ./typescript-express

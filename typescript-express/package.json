@@ -8,7 +8,7 @@
     "dev": "nodemon ./src/index.ts",
     "lint": "eslint --ext .ts --fix .",
     "test": "jest --coverage",
-    "start": "npx tsc"
+    "start": "NODE_ENV=production node ./build/src/index.js"
   },
   "keywords": [],
   "author": "",

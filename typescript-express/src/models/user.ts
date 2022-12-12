@@ -1,9 +1,9 @@
 export type Email = `${string}@${string}.${string}`
 export default interface User {
-  id: number; // Uniqe
+  id: number; 
   first_name: string;
   last_name: string;
-  email: Email; // Uniqe
+  email: Email;
   password: string;
   updated_at?: Date;
   last_login?: Date;

@@ -52,7 +52,6 @@ app.get("/:id", async (req, res) => {
 
 app.post("/", async (req, res) => {
 	try {
-
 		const data = req.body as userFormat;
 		data.password = crypto.createHash('sha256').update(data.password!).digest('hex')
 

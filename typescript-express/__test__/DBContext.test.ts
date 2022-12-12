@@ -21,71 +21,12 @@ describe("DBcontext test", () => {
 
     });
 
-    describe("querry object has client", () => {
+    describe("querry object for user exists", () => {
         test("User querry object", async () => {
-            const querry = await DBContext.instance.user();
+            const querry = await DBContext.instance.user;
             expect(querry).not.toBeNull();
-            expect(querry!.client).not.toBeNull();
         });
     });
 
-    describe("transaction work for all types", () => {
-        const handler = DBContext.instance;
-        let querry: UserQuerryObject | null = null;
-        const insert: Partial<User> = {
-            first_name: "test",
-            last_name: "user",
-            email: "test.user@test.com",
-            password: "test"
-        };
-
-
-
-
-        test("Transaction work for insertRow", async () => {
-
-            querry = await handler.user();
-            const [id, err1] = await handler!.Transaction(querry!, "insertRow", insert);
-            expect(err1).toBeNull();
-            expect(id).not.toBeNull();
-            insert.id = id! as number; 
-
-        });
-
-        test("Transaction work for getrows", async () => {
-
-            const [items, error] = await handler.Transaction(querry!, "getRows");
-            expect(error).toBeNull();
-            expect(items).not.toBeNull();
-            expect(items.length).toBeGreaterThan(0);
-            expect(items).toEqual(
-                expect.arrayContaining([
-                    expect.objectContaining({ email: insert.email })
-                ]));
-
-
-
-        });
-
-        test("Transaction work for getrow", async () => {
-            const [item, error] = await handler.Transaction(querry!, "getRow", insert.id!);
-            expect(error).toBeNull();
-            expect(item).not.toBeNull();
-            expect(item).toEqual(expect.objectContaining({ email: insert.email }));
-        });
-
-
-        test("Transaction work for deleteRow", async () => {
-
-            querry = await handler.user();
-            const [res, err2] = await handler.Transaction(querry!, "deleteRow", insert.id!);
-            expect(err2).toBeNull();
-            expect(res).not.toBeNull();
-
-        });
-
-        test("Trasnaction throws 'invalid key' for any other case", async () =>{
-            expect(await handler.Transaction(querry!, "client")).toBeUndefined();
-        });
-    });
+    
 })
